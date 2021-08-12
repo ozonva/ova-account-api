@@ -28,7 +28,7 @@ func TestFilterWords(t *testing.T) {
 	}
 }
 
-func TestFilterWords2(t *testing.T) {
+func TestFastFilterWords(t *testing.T) {
 	tests := []struct {
 		words []string
 		want  []string
@@ -42,8 +42,8 @@ func TestFilterWords2(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			if got := utils.FilterWords2(tt.words); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FilterWords2() = %v, want %v", got, tt.want)
+			if got := utils.FastFilterWords(tt.words); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FastFilterWords() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -27,9 +27,9 @@ func inSpam(word string) bool {
 	return true
 }
 
-// FilterWords2  filters a list of words by stop words.
+// FastFilterWords filters a list of words by stop words.
 // The complexity is O(n*log(m)).
-func FilterWords2(words []string) []string {
+func FastFilterWords(words []string) []string {
 	return FilterSliceString(words, func(s string) bool {
 		i := sort.SearchStrings(longSortedSpamList, s)
 		if i >= len(longSortedSpamList) {

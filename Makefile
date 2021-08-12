@@ -1,4 +1,4 @@
-.PHONY: build, run, lint
+.PHONY: build, run, lint, test
 
 default: build
 
@@ -11,3 +11,6 @@ run:
 lint:
 	$(info ******************** running lint tools ********************)
 	golangci-lint run -v
+
+test:
+	go test ./...

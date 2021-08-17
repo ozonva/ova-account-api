@@ -19,11 +19,10 @@ func main() {
 
 	fmt.Printf("Service %s.\n", config.Name)
 
-	updatingConfiguration(config, *confPath)
+	updatingConfiguration(config, *confPath, 10)
 }
 
-func updatingConfiguration(config *app.Config, path string) {
-	times := 10
+func updatingConfiguration(config *app.Config, path string, times int) {
 	for i := 0; i < times; i++ {
 		err := config.Update(path)
 		if err != nil {

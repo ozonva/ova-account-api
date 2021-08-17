@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/utils"
 )
 
@@ -69,5 +70,28 @@ func checkErr(t *testing.T, funcName string, err error, expected bool) {
 
 	if !expected && err != nil {
 		t.Errorf("%s got unexpected error: %v", funcName, err)
+	}
+}
+
+func TestConvertAccountsToMap(t *testing.T) {
+	var accounts []entity.Account
+	want := make(map[uint64]entity.Account)
+	checkAccountMap(t, utils.ConvertAccountsToMap(accounts), want)
+
+	acc, _ := entity.NewAccount(1, "vyacheslavv@ozon.ru")
+	accounts = append(accounts, *acc)
+	want[acc.ID] = *acc
+	checkAccountMap(t, utils.ConvertAccountsToMap(accounts), want)
+
+	secondAcc, _ := entity.NewAccount(1, "sergio@ozon.ru")
+	accounts = append(accounts, *secondAcc)
+	want[secondAcc.ID] = *secondAcc
+	checkAccountMap(t, utils.ConvertAccountsToMap(accounts), want)
+}
+
+func checkAccountMap(t *testing.T, got, want map[uint64]entity.Account) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("ConvertAccountsToMap() = %v, want %v", got, want)
 	}
 }

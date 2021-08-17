@@ -1,0 +1,5 @@
+{
+    "name": "ova-account-api",
+    "address": ":8080",
+    "version": "v1"
+}

@@ -1,4 +1,4 @@
-.PHONY: build, run, lint, test
+.PHONY: build, run, lint, test, generate
 
 default: build
 
@@ -14,3 +14,6 @@ lint:
 
 test:
 	go test ./...
+
+generate:
+	go generate ./...

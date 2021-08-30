@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/mocks"
 	"github.com/ozonva/ova-account-api/internal/saver"
@@ -37,7 +38,7 @@ var _ = Describe("Saver", func() {
 				s = saver.NewSaver(10, flusher, time.Millisecond)
 				s.Init()
 
-				s.Save(accounts[0])
+				Expect(s.Save(accounts[0])).ShouldNot(HaveOccurred())
 				time.Sleep(3 * time.Millisecond)
 
 				s.Close()
@@ -53,7 +54,7 @@ var _ = Describe("Saver", func() {
 				flusher.EXPECT().Flush(accounts).Times(1).Return(nil)
 
 				for _, account := range accounts {
-					s.Save(account)
+					Expect(s.Save(account)).ShouldNot(HaveOccurred())
 				}
 
 				time.Sleep(3 * time.Millisecond)
@@ -72,11 +73,11 @@ var _ = Describe("Saver", func() {
 					flusher.EXPECT().Flush(accounts[2:4]).Times(1).Return(nil),
 				)
 
-				s.Save(accounts[0])
-				s.Save(accounts[1])
-				time.Sleep(2 * time.Millisecond)
-				s.Save(accounts[2])
-				s.Save(accounts[3])
+				Expect(s.Save(accounts[0])).ShouldNot(HaveOccurred())
+				Expect(s.Save(accounts[1])).ShouldNot(HaveOccurred())
+				time.Sleep(3 * time.Millisecond)
+				Expect(s.Save(accounts[2])).ShouldNot(HaveOccurred())
+				Expect(s.Save(accounts[3])).ShouldNot(HaveOccurred())
 
 				time.Sleep(3 * time.Millisecond)
 				s.Close()
@@ -92,7 +93,7 @@ var _ = Describe("Saver", func() {
 				flusher.EXPECT().Flush(accounts[0:2]).Times(1).Return(nil)
 
 				for _, account := range accounts {
-					s.Save(account)
+					Expect(s.Save(account)).ShouldNot(HaveOccurred())
 				}
 				s.Close()
 
@@ -112,7 +113,7 @@ var _ = Describe("Saver", func() {
 				)
 
 				for _, account := range accounts {
-					s.Save(account)
+					Expect(s.Save(account)).ShouldNot(HaveOccurred())
 				}
 
 				time.Sleep(3 * time.Millisecond)
@@ -132,7 +133,7 @@ var _ = Describe("Saver", func() {
 				)
 
 				for _, account := range accounts {
-					s.Save(account)
+					Expect(s.Save(account)).ShouldNot(HaveOccurred())
 				}
 
 				time.Sleep(3 * time.Millisecond)
@@ -151,15 +152,35 @@ var _ = Describe("Saver", func() {
 
 				s = saver.NewSaver(2, flusher, time.Millisecond)
 				s.Init()
-				s.Save(accounts[0])
+				Expect(s.Save(accounts[0])).ShouldNot(HaveOccurred())
 				time.Sleep(3 * time.Millisecond)
 				s.Close()
 
 				s.Init()
-				s.Save(accounts[1])
-				s.Save(accounts[2])
+				Expect(s.Save(accounts[1])).ShouldNot(HaveOccurred())
+				Expect(s.Save(accounts[2])).ShouldNot(HaveOccurred())
 				time.Sleep(3 * time.Millisecond)
 				s.Close()
+			})
+		})
+
+		Context("when the buffer is full and cannot be flushed", func() {
+			It("should return error", func() {
+				accounts := generateAccounts(4)
+
+				gomock.InOrder(
+					flusher.EXPECT().Flush(accounts[0:2]).Times(1).Return(accounts[0:2]),
+					flusher.EXPECT().Flush(accounts[0:2]).Times(1).Return(accounts[0:2]),
+				)
+
+				s = saver.NewSaver(2, flusher, time.Millisecond)
+				s.Init()
+				defer s.Close()
+
+				Expect(s.Save(accounts[0])).ShouldNot(HaveOccurred())
+				Expect(s.Save(accounts[1])).ShouldNot(HaveOccurred())
+				Expect(s.Save(accounts[2])).Should(Equal(saver.ErrFullBufferFlush))
+				Expect(s.Save(accounts[3])).Should(Equal(saver.ErrFullBufferFlush))
 			})
 		})
 	})

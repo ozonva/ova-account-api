@@ -1,16 +1,23 @@
 package saver
 
 import (
+	"errors"
 	"sync"
 	"time"
 
+	"github.com/onsi/ginkgo"
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/flusher"
 )
 
+var (
+	// ErrFullBufferFlush is type of error returned when the buffer is full and cannot be flushed.
+	ErrFullBufferFlush = errors.New("failed to flush the full buffer")
+)
+
 // Saver ...
 type Saver interface {
-	Save(entity entity.Account)
+	Save(entity entity.Account) error
 	Init()
 	Close()
 }
@@ -34,15 +41,20 @@ type saver struct {
 }
 
 // Save adds the account to the list for saving.
-func (s *saver) Save(account entity.Account) {
+func (s *saver) Save(account entity.Account) error {
 	if len(s.buffer) == cap(s.buffer) {
 		s.flush()
+	}
+
+	if len(s.buffer) == cap(s.buffer) {
+		return ErrFullBufferFlush
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.buffer = append(s.buffer, account)
+	return nil
 }
 
 // Init inits ...
@@ -50,6 +62,7 @@ func (s *saver) Init() {
 	s.done = make(chan struct{}, 1)
 
 	go func() {
+		defer ginkgo.GinkgoRecover()
 		ticker := time.NewTicker(s.timeout)
 		defer ticker.Stop()
 

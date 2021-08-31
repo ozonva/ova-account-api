@@ -8,9 +8,10 @@ import (
 
 // Config represents the application configuration.
 type Config struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
-	Version string `json:"version"`
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	GrpcPort string `json:"grpc_port"`
+	Version  string `json:"version"`
 }
 
 // NewConfig creates a new Config.

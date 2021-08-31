@@ -8,10 +8,10 @@ option go_package = "github.com/ozonva/ova-account-api/pkg/ova-account-api;ova_a
 
 
 service AccountService {
-    rpc DescribeAccount(ID) returns (Account) {}
-    rpc ListAccounts(ListAccountsRequest) returns (AccountsList) {}
-    rpc CreateAccount(CreateAccountRequest) returns (Account) {}
-    rpc RemoveAccount(ID) returns (google.protobuf.Empty) {}
+    rpc DescribeAccount(DescribeAccountRequest) returns (DescribeAccountResponse) {}
+    rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+    rpc RemoveAccount(RemoveAccountRequest) returns (google.protobuf.Empty) {}
 }
 
 // Account is the protobuf response of the entity.Account.
@@ -21,16 +21,28 @@ message Account {
     string value = 3;
 }
 
-message AccountsList {
+message DescribeAccountResponse {
+    Account account = 1;
+}
+
+message ListAccountsResponse {
     repeated Account accounts = 1;
 }
 
-message ID {
+message DescribeAccountRequest {
+    uint64 id = 1;
+}
+
+message RemoveAccountRequest {
     uint64 id = 1;
 }
 
 message CreateAccountRequest {
     string value = 2;
+}
+
+message CreateAccountResponse {
+    Account account = 1;
 }
 
 message ListAccountsRequest {

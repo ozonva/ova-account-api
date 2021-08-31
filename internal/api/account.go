@@ -25,26 +25,26 @@ func NewAccountService(logger zerolog.Logger) *AccountService {
 	}
 }
 
-func (s *AccountService) DescribeAccount(ctx context.Context, id *pb.ID) (*pb.Account, error) {
-	s.logger.Info().Uint64("id", id.Id).Msg("RPC: DescribeAccount")
+func (s *AccountService) DescribeAccount(ctx context.Context, req *pb.DescribeAccountRequest) (*pb.DescribeAccountResponse, error) {
+	s.logger.Info().Uint64("id", req.Id).Msg("RPC: DescribeAccount")
 
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeAccount not implemented")
 }
 
-func (s *AccountService) ListAccounts(ctx context.Context, request *pb.ListAccountsRequest) (*pb.AccountsList, error) {
-	s.logger.Info().Uint64("user_id", request.UserId).Msg("RPC: ListAccounts")
+func (s *AccountService) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
+	s.logger.Info().Uint64("user_id", req.UserId).Msg("RPC: ListAccounts")
 
 	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
 }
 
-func (s *AccountService) CreateAccount(ctx context.Context, request *pb.CreateAccountRequest) (*pb.Account, error) {
-	s.logger.Info().Str("account", request.Value).Msg("RPC: CreateAccount")
+func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.CreateAccountResponse, error) {
+	s.logger.Info().Str("account", req.Value).Msg("RPC: CreateAccount")
 
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
 
-func (s *AccountService) RemoveAccount(ctx context.Context, id *pb.ID) (*emptypb.Empty, error) {
-	s.logger.Info().Uint64("id", id.Id).Msg("RPC: RemoveAccount")
+func (s *AccountService) RemoveAccount(ctx context.Context, req *pb.RemoveAccountRequest) (*emptypb.Empty, error) {
+	s.logger.Info().Uint64("id", req.Id).Msg("RPC: RemoveAccount")
 
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveAccount not implemented")
 }

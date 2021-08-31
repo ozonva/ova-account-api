@@ -19,10 +19,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccountServiceClient interface {
-	DescribeAccount(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Account, error)
-	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*AccountsList, error)
-	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error)
-	RemoveAccount(ctx context.Context, in *ID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DescribeAccount(ctx context.Context, in *DescribeAccountRequest, opts ...grpc.CallOption) (*DescribeAccountResponse, error)
+	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
+	RemoveAccount(ctx context.Context, in *RemoveAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type accountServiceClient struct {
@@ -33,8 +33,8 @@ func NewAccountServiceClient(cc grpc.ClientConnInterface) AccountServiceClient {
 	return &accountServiceClient{cc}
 }
 
-func (c *accountServiceClient) DescribeAccount(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Account, error) {
-	out := new(Account)
+func (c *accountServiceClient) DescribeAccount(ctx context.Context, in *DescribeAccountRequest, opts ...grpc.CallOption) (*DescribeAccountResponse, error) {
+	out := new(DescribeAccountResponse)
 	err := c.cc.Invoke(ctx, "/ova.account.api.AccountService/DescribeAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -42,8 +42,8 @@ func (c *accountServiceClient) DescribeAccount(ctx context.Context, in *ID, opts
 	return out, nil
 }
 
-func (c *accountServiceClient) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*AccountsList, error) {
-	out := new(AccountsList)
+func (c *accountServiceClient) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error) {
+	out := new(ListAccountsResponse)
 	err := c.cc.Invoke(ctx, "/ova.account.api.AccountService/ListAccounts", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -51,8 +51,8 @@ func (c *accountServiceClient) ListAccounts(ctx context.Context, in *ListAccount
 	return out, nil
 }
 
-func (c *accountServiceClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*Account, error) {
-	out := new(Account)
+func (c *accountServiceClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error) {
+	out := new(CreateAccountResponse)
 	err := c.cc.Invoke(ctx, "/ova.account.api.AccountService/CreateAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (c *accountServiceClient) CreateAccount(ctx context.Context, in *CreateAcco
 	return out, nil
 }
 
-func (c *accountServiceClient) RemoveAccount(ctx context.Context, in *ID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *accountServiceClient) RemoveAccount(ctx context.Context, in *RemoveAccountRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/ova.account.api.AccountService/RemoveAccount", in, out, opts...)
 	if err != nil {
@@ -73,10 +73,10 @@ func (c *accountServiceClient) RemoveAccount(ctx context.Context, in *ID, opts .
 // All implementations must embed UnimplementedAccountServiceServer
 // for forward compatibility
 type AccountServiceServer interface {
-	DescribeAccount(context.Context, *ID) (*Account, error)
-	ListAccounts(context.Context, *ListAccountsRequest) (*AccountsList, error)
-	CreateAccount(context.Context, *CreateAccountRequest) (*Account, error)
-	RemoveAccount(context.Context, *ID) (*emptypb.Empty, error)
+	DescribeAccount(context.Context, *DescribeAccountRequest) (*DescribeAccountResponse, error)
+	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
+	RemoveAccount(context.Context, *RemoveAccountRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAccountServiceServer()
 }
 
@@ -84,16 +84,16 @@ type AccountServiceServer interface {
 type UnimplementedAccountServiceServer struct {
 }
 
-func (UnimplementedAccountServiceServer) DescribeAccount(context.Context, *ID) (*Account, error) {
+func (UnimplementedAccountServiceServer) DescribeAccount(context.Context, *DescribeAccountRequest) (*DescribeAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeAccount not implemented")
 }
-func (UnimplementedAccountServiceServer) ListAccounts(context.Context, *ListAccountsRequest) (*AccountsList, error) {
+func (UnimplementedAccountServiceServer) ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
 }
-func (UnimplementedAccountServiceServer) CreateAccount(context.Context, *CreateAccountRequest) (*Account, error) {
+func (UnimplementedAccountServiceServer) CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedAccountServiceServer) RemoveAccount(context.Context, *ID) (*emptypb.Empty, error) {
+func (UnimplementedAccountServiceServer) RemoveAccount(context.Context, *RemoveAccountRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveAccount not implemented")
 }
 func (UnimplementedAccountServiceServer) mustEmbedUnimplementedAccountServiceServer() {}
@@ -110,7 +110,7 @@ func RegisterAccountServiceServer(s grpc.ServiceRegistrar, srv AccountServiceSer
 }
 
 func _AccountService_DescribeAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ID)
+	in := new(DescribeAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func _AccountService_DescribeAccount_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/ova.account.api.AccountService/DescribeAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).DescribeAccount(ctx, req.(*ID))
+		return srv.(AccountServiceServer).DescribeAccount(ctx, req.(*DescribeAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -164,7 +164,7 @@ func _AccountService_CreateAccount_Handler(srv interface{}, ctx context.Context,
 }
 
 func _AccountService_RemoveAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ID)
+	in := new(RemoveAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func _AccountService_RemoveAccount_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/ova.account.api.AccountService/RemoveAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).RemoveAccount(ctx, req.(*ID))
+		return srv.(AccountServiceServer).RemoveAccount(ctx, req.(*RemoveAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

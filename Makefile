@@ -1,4 +1,4 @@
-.PHONY: build, run, lint, test, generate, generate-grpc, bin-deps
+.PHONY: build, run, lint, test, generate, generate-grpc, bin-deps, up, down
 
 LOCAL_BIN:=$(CURDIR)/bin
 
@@ -35,3 +35,9 @@ bin-deps:
 	GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down

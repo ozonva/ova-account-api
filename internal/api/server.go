@@ -5,6 +5,7 @@ import (
 
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"github.com/ozonva/ova-account-api/internal/app"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -21,7 +22,7 @@ type Server struct {
 }
 
 // NewServer creates a new grpc server.
-func NewServer(logger zerolog.Logger, port string) *Server {
+func NewServer(logger zerolog.Logger, application *app.App) *Server {
 	recoveryHandler := func(p interface{}) (err error) {
 		logger.Error().Msgf("panic triggered: %v", p)
 		return status.Errorf(codes.Unknown, "panic triggered: %v", p)
@@ -33,14 +34,14 @@ func NewServer(logger zerolog.Logger, port string) *Server {
 		),
 	)
 
-	accountService := NewAccountService(logger)
+	accountService := NewAccountService(logger, application.Store.Account())
 	pb.RegisterAccountServiceServer(server, accountService)
 
 	return &Server{
 		server: server,
 		logger: logger,
 		errors: make(chan error, 1),
-		port:   port,
+		port:   application.Conf.GrpcPort,
 	}
 }
 

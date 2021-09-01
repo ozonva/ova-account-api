@@ -19,9 +19,10 @@ type AccountService struct {
 }
 
 // NewAccountService ...
-func NewAccountService(logger zerolog.Logger) *AccountService {
+func NewAccountService(logger zerolog.Logger, repo repo.Repo) *AccountService {
 	return &AccountService{
 		logger: logger.With().Str("service", "AccountService").Logger(),
+		repo:   repo,
 	}
 }
 

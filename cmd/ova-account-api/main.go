@@ -23,19 +23,24 @@ func main() {
 	}
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
 
-	config, err := app.ParseConfig(*confPath)
+	application, err := app.Init(*confPath)
 	if err != nil {
-		logger.Fatal().Msgf("Can't process the configuration: %v", err)
+		logger.Fatal().Err(err).Msg("")
 	}
+	defer func() {
+		if err := application.Release(); err != nil {
+			logger.Error().Err(err)
+		}
+	}()
 
-	fmt.Printf("Service %s.\n", config.Name)
+	fmt.Printf("Service %s.\n", application.Conf.Name)
 
-	updatingConfiguration(logger, config, *confPath, 10)
+	updatingConfiguration(logger, application.Conf, *confPath, 10)
 
 	logger.Info().Msg("Starting the server...")
-	server := api.NewServer(logger, config.GrpcPort)
+	server := api.NewServer(logger, application)
 	server.Start()
-	logger.Info().Msgf("The application is ready to serve requests on port %s.", config.GrpcPort)
+	logger.Info().Msgf("The application is ready to serve requests on port %s.", application.Conf.GrpcPort)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)

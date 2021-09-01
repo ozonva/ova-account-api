@@ -2,16 +2,31 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 )
 
 // Config represents the application configuration.
 type Config struct {
-	Name     string `json:"name"`
-	Address  string `json:"address"`
-	GrpcPort string `json:"grpc_port"`
-	Version  string `json:"version"`
+	Name     string   `json:"name"`
+	Address  string   `json:"address"`
+	GrpcPort string   `json:"grpc_port"`
+	Version  string   `json:"version"`
+	DB       DBConfig `json:"db"`
+}
+
+type DBConfig struct {
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Database string `json:"database"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
+
+// DSN return the data source name of DB.
+func (c *DBConfig) DSN() string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", c.User, c.Password, c.Host, c.Port, c.Database)
 }
 
 // NewConfig creates a new Config.

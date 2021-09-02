@@ -35,6 +35,17 @@ bin-deps:
 	GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	GOBIN=$(LOCAL_BIN) go get -u github.com/pressly/goose/v3/cmd/goose
+
+migration: # make migration name=create_user_table
+	$(LOCAL_BIN)/goose -dir=db/migrations create $(name) sql
+	$(LOCAL_BIN)/goose -dir=db/migrations fix
+
+migrate:
+	$(LOCAL_BIN)/goose -dir=db/migrations postgres "user=account password=secret port=54321  dbname=account sslmode=disable" up
+
+migrate-down:
+	$(LOCAL_BIN)/goose -dir=db/migrations postgres "user=account password=secret port=54321  dbname=account sslmode=disable" down
 
 up:
 	docker-compose up -d

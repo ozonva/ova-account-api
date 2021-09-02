@@ -7,4 +7,5 @@ type Repo interface {
 	AddAccounts(entities []entity.Account) error
 	ListAccounts(limit, offset uint64) ([]entity.Account, error)
 	DescribeAccount(entityID uint64) (*entity.Account, error)
+	RemoveAccount(id uint64) error
 }

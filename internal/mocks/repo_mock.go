@@ -77,3 +77,17 @@ func (mr *MockRepoMockRecorder) ListAccounts(arg0, arg1 interface{}) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*MockRepo)(nil).ListAccounts), arg0, arg1)
 }
+
+// RemoveAccount mocks base method.
+func (m *MockRepo) RemoveAccount(arg0 uint64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveAccount", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveAccount indicates an expected call of RemoveAccount.
+func (mr *MockRepoMockRecorder) RemoveAccount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAccount", reflect.TypeOf((*MockRepo)(nil).RemoveAccount), arg0)
+}

@@ -12,8 +12,8 @@ var AccountCounter uint64
 // Account represents the note's category.
 type Account struct {
 	ID     uint64
-	UserID uint64
-	value  string
+	UserID uint64 `db:"user_id"`
+	Value  string
 }
 
 // NewAccount creates a new entity Account.
@@ -25,32 +25,32 @@ func NewAccount(userID uint64, value string) (*Account, error) {
 
 	AccountCounter++
 
-	return &Account{ID: AccountCounter, UserID: userID, value: address.Address}, nil
+	return &Account{ID: AccountCounter, UserID: userID, Value: address.Address}, nil
 }
 
-// Value returns the value of the Account.
-func (a Account) Value() string {
-	return a.value
-}
+// // Value returns the Value of the Account.
+// func (a Account) Value() string {
+// 	return a.Value
+// }
 
 // Domain returns the domain of the Account.
 func (a Account) Domain() string {
-	at := strings.LastIndex(a.value, "@")
+	at := strings.LastIndex(a.Value, "@")
 	if at == -1 {
 		return ""
 	}
 
-	return a.value[at+1:]
+	return a.Value[at+1:]
 }
 
 // Username returns the username of the Account.
 func (a Account) Username() string {
-	at := strings.LastIndex(a.value, "@")
+	at := strings.LastIndex(a.Value, "@")
 	if at == -1 {
 		return ""
 	}
 
-	return a.value[:at]
+	return a.Value[:at]
 }
 
 // Exists checks if account exists on the internet.

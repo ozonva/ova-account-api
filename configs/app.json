@@ -2,5 +2,12 @@
     "name": "ova-account-api",
     "address": ":8080",
     "grpc_port": "8080",
-    "version": "v1"
+    "version": "v1",
+    "db": {
+        "host": "localhost",
+        "port": "54321",
+        "database": "account",
+        "user": "account",
+        "password": "secret"
+    }
 }

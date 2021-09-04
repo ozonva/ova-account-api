@@ -11,5 +11,6 @@ type Repo interface {
 	AddAccounts(ctx context.Context, entities []entity.Account) error
 	ListAccounts(ctx context.Context, limit, offset uint64) ([]entity.Account, error)
 	DescribeAccount(ctx context.Context, id string) (*entity.Account, error)
+	UpdateAccount(ctx context.Context, account entity.Account) error
 	RemoveAccount(ctx context.Context, id string) error
 }

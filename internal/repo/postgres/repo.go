@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ozonva/ova-account-api/internal/entity"
@@ -37,6 +38,30 @@ func (r *accountRepo) ListAccounts(ctx context.Context, limit, offset uint64) ([
 	err := r.db.SelectContext(ctx, &accounts, "SELECT id, value, user_id FROM accounts LIMIT $1 OFFSET $2", limit, offset)
 
 	return accounts, err
+}
+
+func (r *accountRepo) UpdateAccount(ctx context.Context, account entity.Account) error {
+	result, err := r.db.ExecContext(
+		ctx,
+		"UPDATE accounts SET value = $2, user_id = $3, updated_at = $4 where id = $1",
+		account.ID,
+		account.Value,
+		account.UserID,
+		time.Now())
+
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return repo.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (r *accountRepo) RemoveAccount(ctx context.Context, id string) error {

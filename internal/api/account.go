@@ -5,6 +5,7 @@ import (
 
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/repo"
+	"github.com/ozonva/ova-account-api/internal/utils"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
@@ -63,6 +64,49 @@ func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 	}
 
 	return &pb.CreateAccountResponse{Account: AccountMarshal(*account)}, nil
+}
+
+func (s *AccountService) MultiCreateAccount(ctx context.Context, req *pb.MultiCreateAccountRequest) (*emptypb.Empty, error) {
+	s.logger.Info().Msg("RPC: MultiCreateAccount")
+
+	accounts := make([]entity.Account, 0, len(req.Accounts))
+	for _, a := range req.Accounts {
+		acc, err := entity.NewAccount(a.UserId, a.Value)
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
+		accounts = append(accounts, *acc)
+	}
+
+	batchSize := 32
+	chunks, _ := utils.ChunkSliceAccount(accounts, batchSize)
+	for _, chunk := range chunks {
+		if err := s.createChunkAccounts(ctx, chunk); err != nil {
+			return nil, status.Errorf(codes.Internal, err.Error())
+		}
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+func (s *AccountService) createChunkAccounts(ctx context.Context, accounts []entity.Account) error {
+	if err := s.repo.AddAccounts(ctx, accounts); err != nil {
+		return err
+	}
+	// TODO: span here
+	return nil
+}
+
+func (s *AccountService) UpdateAccount(ctx context.Context, req *pb.UpdateAccountRequest) (*pb.UpdateAccountResponse, error) {
+	s.logger.Info().Str("account", req.Account.Value).Msg("RPC: UpdateAccount")
+	// TODO: add validation
+	account := AccountUnmarshal(req.Account)
+	err := s.repo.UpdateAccount(ctx, account)
+	if err != nil {
+		return nil, wrapError(err)
+	}
+
+	return &pb.UpdateAccountResponse{Account: AccountMarshal(account)}, nil
 }
 
 func (s *AccountService) RemoveAccount(ctx context.Context, req *pb.RemoveAccountRequest) (*emptypb.Empty, error) {

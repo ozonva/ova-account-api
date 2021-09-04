@@ -1,6 +1,7 @@
 package saver
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -91,7 +92,7 @@ func (s *saver) flush() {
 		return
 	}
 
-	unsaved := s.flusher.Flush(s.buffer)
+	unsaved := s.flusher.Flush(context.Background(), s.buffer)
 	s.buffer = s.buffer[:0]
 	s.buffer = append(s.buffer, unsaved...)
 }

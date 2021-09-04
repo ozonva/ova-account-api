@@ -43,7 +43,7 @@ var _ = Describe("Account Service", func() {
 				req := &pb.CreateAccountRequest{Value: "user@ozon.ru"}
 				acc := entity.Account{ID: 1, UserID: 1, Value: "user@ozon.ru"}
 
-				mockRepo.EXPECT().AddAccounts([]entity.Account{acc}).Return(nil)
+				mockRepo.EXPECT().AddAccounts(ctx, []entity.Account{acc}).Return(nil)
 
 				resp, err := service.CreateAccount(ctx, req)
 
@@ -59,7 +59,7 @@ var _ = Describe("Account Service", func() {
 				acc, _ := entity.NewAccount(1, "user@ozon.ru")
 				req := &pb.DescribeAccountRequest{Id: acc.ID}
 
-				mockRepo.EXPECT().DescribeAccount(acc.ID).Return(acc, nil)
+				mockRepo.EXPECT().DescribeAccount(ctx, acc.ID).Return(acc, nil)
 
 				resp, err := service.DescribeAccount(ctx, req)
 				checkAccountInResponse(resp.GetAccount(), *acc)

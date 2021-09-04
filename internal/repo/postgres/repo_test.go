@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"context"
 	"database/sql/driver"
 	"errors"
 	"fmt"
@@ -34,6 +35,7 @@ func generateAccounts(count int) []entity.Account {
 }
 
 func Test_accountRepo_ListAccounts(t *testing.T) {
+	ctx := context.Background()
 	db, mock := newMock(t)
 	defer db.Close()
 	repo := NewRepo(db)
@@ -48,12 +50,13 @@ func Test_accountRepo_ListAccounts(t *testing.T) {
 		WithArgs(11, 64).
 		WillReturnRows(rows)
 
-	result, err := repo.ListAccounts(11, 64)
+	result, err := repo.ListAccounts(ctx, 11, 64)
 	assert.NoError(t, err)
 	assert.Equal(t, accounts, result)
 }
 
 func Test_accountRepo_DescribeAccount(t *testing.T) {
+	ctx := context.Background()
 	db, mock := newMock(t)
 	defer db.Close()
 	repo := NewRepo(db)
@@ -66,12 +69,13 @@ func Test_accountRepo_DescribeAccount(t *testing.T) {
 		WithArgs(account.ID).
 		WillReturnRows(rows)
 
-	result, err := repo.DescribeAccount(account.ID)
+	result, err := repo.DescribeAccount(ctx, account.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, account, *result)
 }
 
 func Test_accountRepo_AddAccounts(t *testing.T) {
+	ctx := context.Background()
 	db, mock := newMock(t)
 	defer db.Close()
 	repo := NewRepo(db)
@@ -86,11 +90,12 @@ func Test_accountRepo_AddAccounts(t *testing.T) {
 		WithArgs(args...).
 		WillReturnResult(sqlmock.NewResult(4, 4))
 
-	err := repo.AddAccounts(accounts)
+	err := repo.AddAccounts(ctx, accounts)
 	assert.NoError(t, err)
 }
 
 func Test_accountRepo_RemoveAccount(t *testing.T) {
+	ctx := context.Background()
 	db, mock := newMock(t)
 	defer db.Close()
 	repo := NewRepo(db)
@@ -101,11 +106,12 @@ func Test_accountRepo_RemoveAccount(t *testing.T) {
 		WithArgs(account.ID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err := repo.RemoveAccount(account.ID)
+	err := repo.RemoveAccount(ctx, account.ID)
 	assert.NoError(t, err)
 }
 
 func Test_accountRepo_RemoveAccountWithError(t *testing.T) {
+	ctx := context.Background()
 	db, mock := newMock(t)
 	defer db.Close()
 	repo := NewRepo(db)
@@ -117,6 +123,6 @@ func Test_accountRepo_RemoveAccountWithError(t *testing.T) {
 		WithArgs(account.ID).
 		WillReturnError(err)
 
-	resultErr := repo.RemoveAccount(account.ID)
+	resultErr := repo.RemoveAccount(ctx, account.ID)
 	assert.ErrorIs(t, err, resultErr)
 }

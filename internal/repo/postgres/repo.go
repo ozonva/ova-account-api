@@ -16,28 +16,28 @@ func NewRepo(db *sqlx.DB) *accountRepo {
 	return &accountRepo{db: db}
 }
 
-func (r *accountRepo) DescribeAccount(id uint64) (*entity.Account, error) {
+func (r *accountRepo) DescribeAccount(ctx context.Context, id uint64) (*entity.Account, error) {
 	acc := &entity.Account{}
-	err := r.db.GetContext(context.TODO(), acc, "SELECT id, value, user_id FROM accounts where id = $1 LIMIT 1", id)
+	err := r.db.GetContext(ctx, acc, "SELECT id, value, user_id FROM accounts where id = $1 LIMIT 1", id)
 
 	return acc, repo.DBError(err)
 }
 
-func (r *accountRepo) AddAccounts(accounts []entity.Account) error {
-	_, err := r.db.NamedExecContext(context.TODO(), `INSERT INTO accounts (value, user_id) VALUES (:value, :user_id)`, accounts)
+func (r *accountRepo) AddAccounts(ctx context.Context, accounts []entity.Account) error {
+	_, err := r.db.NamedExecContext(ctx, `INSERT INTO accounts (value, user_id) VALUES (:value, :user_id)`, accounts)
 
 	return err
 }
 
-func (r *accountRepo) ListAccounts(limit, offset uint64) ([]entity.Account, error) {
+func (r *accountRepo) ListAccounts(ctx context.Context, limit, offset uint64) ([]entity.Account, error) {
 	var accounts []entity.Account
-	err := r.db.SelectContext(context.TODO(), &accounts, "SELECT id, value, user_id FROM accounts LIMIT $1 OFFSET $2", limit, offset)
+	err := r.db.SelectContext(ctx, &accounts, "SELECT id, value, user_id FROM accounts LIMIT $1 OFFSET $2", limit, offset)
 
 	return accounts, err
 }
 
-func (r *accountRepo) RemoveAccount(id uint64) error {
-	_, err := r.db.ExecContext(context.TODO(), "DELETE FROM accounts WHERE id = $1", id)
+func (r *accountRepo) RemoveAccount(ctx context.Context, id uint64) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM accounts WHERE id = $1", id)
 
 	return err
 }

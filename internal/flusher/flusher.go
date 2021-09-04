@@ -1,6 +1,8 @@
 package flusher
 
 import (
+	"context"
+
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	"github.com/ozonva/ova-account-api/internal/utils"
@@ -8,7 +10,7 @@ import (
 
 // Flusher represents an interface for flushing entity.Account to the repository.
 type Flusher interface {
-	Flush(entities []entity.Account) []entity.Account
+	Flush(ctx context.Context, entities []entity.Account) []entity.Account
 }
 
 // NewFlusher creates Flusher with support for batch saving.
@@ -25,7 +27,7 @@ type flusher struct {
 }
 
 // Flush flushes the list of entity.Account to the storage.
-func (f *flusher) Flush(accounts []entity.Account) []entity.Account {
+func (f *flusher) Flush(ctx context.Context, accounts []entity.Account) []entity.Account {
 	chunks, err := utils.ChunkSliceAccount(accounts, f.chunkSize)
 	if err != nil {
 		return accounts
@@ -33,7 +35,7 @@ func (f *flusher) Flush(accounts []entity.Account) []entity.Account {
 
 	var unsaved []entity.Account
 	for _, chunk := range chunks {
-		err := f.repo.AddAccounts(chunk)
+		err := f.repo.AddAccounts(ctx, chunk)
 		if err != nil {
 			unsaved = append(unsaved, chunk...)
 		}

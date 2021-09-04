@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,59 +36,59 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // AddAccounts mocks base method.
-func (m *MockRepo) AddAccounts(arg0 []entity.Account) error {
+func (m *MockRepo) AddAccounts(arg0 context.Context, arg1 []entity.Account) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddAccounts", arg0)
+	ret := m.ctrl.Call(m, "AddAccounts", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddAccounts indicates an expected call of AddAccounts.
-func (mr *MockRepoMockRecorder) AddAccounts(arg0 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) AddAccounts(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAccounts", reflect.TypeOf((*MockRepo)(nil).AddAccounts), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAccounts", reflect.TypeOf((*MockRepo)(nil).AddAccounts), arg0, arg1)
 }
 
 // DescribeAccount mocks base method.
-func (m *MockRepo) DescribeAccount(arg0 uint64) (*entity.Account, error) {
+func (m *MockRepo) DescribeAccount(arg0 context.Context, arg1 uint64) (*entity.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DescribeAccount", arg0)
+	ret := m.ctrl.Call(m, "DescribeAccount", arg0, arg1)
 	ret0, _ := ret[0].(*entity.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DescribeAccount indicates an expected call of DescribeAccount.
-func (mr *MockRepoMockRecorder) DescribeAccount(arg0 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) DescribeAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeAccount", reflect.TypeOf((*MockRepo)(nil).DescribeAccount), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeAccount", reflect.TypeOf((*MockRepo)(nil).DescribeAccount), arg0, arg1)
 }
 
 // ListAccounts mocks base method.
-func (m *MockRepo) ListAccounts(arg0, arg1 uint64) ([]entity.Account, error) {
+func (m *MockRepo) ListAccounts(arg0 context.Context, arg1, arg2 uint64) ([]entity.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListAccounts", arg0, arg1)
+	ret := m.ctrl.Call(m, "ListAccounts", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]entity.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListAccounts indicates an expected call of ListAccounts.
-func (mr *MockRepoMockRecorder) ListAccounts(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) ListAccounts(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*MockRepo)(nil).ListAccounts), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccounts", reflect.TypeOf((*MockRepo)(nil).ListAccounts), arg0, arg1, arg2)
 }
 
 // RemoveAccount mocks base method.
-func (m *MockRepo) RemoveAccount(arg0 uint64) error {
+func (m *MockRepo) RemoveAccount(arg0 context.Context, arg1 uint64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveAccount", arg0)
+	ret := m.ctrl.Call(m, "RemoveAccount", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveAccount indicates an expected call of RemoveAccount.
-func (mr *MockRepoMockRecorder) RemoveAccount(arg0 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) RemoveAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAccount", reflect.TypeOf((*MockRepo)(nil).RemoveAccount), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAccount", reflect.TypeOf((*MockRepo)(nil).RemoveAccount), arg0, arg1)
 }

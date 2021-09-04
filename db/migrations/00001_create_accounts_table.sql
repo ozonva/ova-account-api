@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS accounts
 (
-    id         serial
+    id         uuid         not null
         constraint accounts_pkey primary key,
     value      varchar(255) not null,
     user_id    bigint       not null,

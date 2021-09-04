@@ -50,7 +50,7 @@ func (mr *MockRepoMockRecorder) AddAccounts(arg0, arg1 interface{}) *gomock.Call
 }
 
 // DescribeAccount mocks base method.
-func (m *MockRepo) DescribeAccount(arg0 context.Context, arg1 uint64) (*entity.Account, error) {
+func (m *MockRepo) DescribeAccount(arg0 context.Context, arg1 string) (*entity.Account, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeAccount", arg0, arg1)
 	ret0, _ := ret[0].(*entity.Account)
@@ -80,7 +80,7 @@ func (mr *MockRepoMockRecorder) ListAccounts(arg0, arg1, arg2 interface{}) *gomo
 }
 
 // RemoveAccount mocks base method.
-func (m *MockRepo) RemoveAccount(arg0 context.Context, arg1 uint64) error {
+func (m *MockRepo) RemoveAccount(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAccount", arg0, arg1)
 	ret0, _ := ret[0].(error)

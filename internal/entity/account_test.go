@@ -14,18 +14,6 @@ func TestAccount(t *testing.T) {
 	assertTrue(t, account.Exists(), "account.Exists()")
 }
 
-func TestAccountID(t *testing.T) {
-	entity.AccountCounter = 0
-	_, err := entity.NewAccount(1, "vyacheslavv@ozon.ru")
-	assertNoError(t, err)
-
-	second, err := entity.NewAccount(1, "sergio@ozon.ru")
-	assertNoError(t, err)
-	if second.ID != 2 {
-		t.Fatalf("Account.ID = %d, want = 2\n", second.ID)
-	}
-}
-
 func TestAccountInvalidAddress(t *testing.T) {
 	_, err := entity.NewAccount(1, "vyacheslavv")
 	if err == nil {

@@ -28,7 +28,7 @@ func NewAccountService(logger zerolog.Logger, repo repo.Repo) *AccountService {
 }
 
 func (s *AccountService) DescribeAccount(ctx context.Context, req *pb.DescribeAccountRequest) (*pb.DescribeAccountResponse, error) {
-	s.logger.Info().Uint64("id", req.Id).Msg("RPC: DescribeAccount")
+	s.logger.Info().Str("id", req.Id).Msg("RPC: DescribeAccount")
 
 	account, err := s.repo.DescribeAccount(ctx, req.Id)
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *AccountService) ListAccounts(ctx context.Context, req *pb.ListAccountsR
 func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.CreateAccountResponse, error) {
 	s.logger.Info().Str("account", req.Value).Msg("RPC: CreateAccount")
 
-	account, err := entity.NewAccount(1, req.Value)
+	account, err := entity.NewAccount(req.UserId, req.Value)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -66,7 +66,7 @@ func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 }
 
 func (s *AccountService) RemoveAccount(ctx context.Context, req *pb.RemoveAccountRequest) (*emptypb.Empty, error) {
-	s.logger.Info().Uint64("id", req.Id).Msg("RPC: RemoveAccount")
+	s.logger.Info().Str("id", req.Id).Msg("RPC: RemoveAccount")
 
 	if err := s.repo.RemoveAccount(ctx, req.Id); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())

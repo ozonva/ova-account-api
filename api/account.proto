@@ -16,7 +16,7 @@ service AccountService {
 
 // Account is the protobuf response of the entity.Account.
 message Account {
-    uint64 id = 1;
+    string id = 1;
     uint64 user_id = 2;
     string value = 3;
 }
@@ -30,14 +30,15 @@ message ListAccountsResponse {
 }
 
 message DescribeAccountRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message RemoveAccountRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message CreateAccountRequest {
+    uint64 user_id = 1;
     string value = 2;
 }
 

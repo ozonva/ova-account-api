@@ -75,7 +75,7 @@ func checkErr(t *testing.T, funcName string, err error, expected bool) {
 
 func TestConvertAccountsToMap(t *testing.T) {
 	var accounts []entity.Account
-	want := make(map[uint64]entity.Account)
+	want := make(map[string]entity.Account)
 	checkAccountMap(t, utils.ConvertAccountsToMap(accounts), want)
 
 	acc, _ := entity.NewAccount(1, "vyacheslavv@ozon.ru")
@@ -89,7 +89,7 @@ func TestConvertAccountsToMap(t *testing.T) {
 	checkAccountMap(t, utils.ConvertAccountsToMap(accounts), want)
 }
 
-func checkAccountMap(t *testing.T, got, want map[uint64]entity.Account) {
+func checkAccountMap(t *testing.T, got, want map[string]entity.Account) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("ConvertAccountsToMap() = %v, want %v", got, want)

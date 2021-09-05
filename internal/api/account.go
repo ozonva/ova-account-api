@@ -3,6 +3,8 @@ package api
 import (
 	context "context"
 
+	"github.com/opentracing/opentracing-go"
+	olog "github.com/opentracing/opentracing-go/log"
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	"github.com/ozonva/ova-account-api/internal/utils"
@@ -69,10 +71,16 @@ func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 func (s *AccountService) MultiCreateAccount(ctx context.Context, req *pb.MultiCreateAccountRequest) (*emptypb.Empty, error) {
 	s.logger.Info().Msg("RPC: MultiCreateAccount")
 
+	span, ctx := opentracing.StartSpanFromContext(ctx, "MultiCreateAccount")
+	span.LogFields(olog.Int("Count", len(req.Accounts)))
+	defer span.Finish()
+
 	accounts := make([]entity.Account, 0, len(req.Accounts))
 	for _, a := range req.Accounts {
 		acc, err := entity.NewAccount(a.UserId, a.Value)
 		if err != nil {
+			span.SetTag("error", true)
+			span.LogFields(olog.Error(err))
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 		accounts = append(accounts, *acc)
@@ -81,7 +89,7 @@ func (s *AccountService) MultiCreateAccount(ctx context.Context, req *pb.MultiCr
 	batchSize := 32
 	chunks, _ := utils.ChunkSliceAccount(accounts, batchSize)
 	for _, chunk := range chunks {
-		if err := s.createChunkAccounts(ctx, chunk); err != nil {
+		if err := s.createChunkAccounts(ctx, span, chunk); err != nil {
 			return nil, status.Errorf(codes.Internal, err.Error())
 		}
 	}
@@ -89,11 +97,17 @@ func (s *AccountService) MultiCreateAccount(ctx context.Context, req *pb.MultiCr
 	return &emptypb.Empty{}, nil
 }
 
-func (s *AccountService) createChunkAccounts(ctx context.Context, accounts []entity.Account) error {
+func (s *AccountService) createChunkAccounts(ctx context.Context, parentSpan opentracing.Span, accounts []entity.Account) error {
+	span := opentracing.StartSpan("MultiCreateAccount-Batch", opentracing.ChildOf(parentSpan.Context()))
+	span.LogFields(olog.Int("Count", len(accounts)))
+	defer span.Finish()
+
 	if err := s.repo.AddAccounts(ctx, accounts); err != nil {
+		span.SetTag("error", true)
+		span.LogFields(olog.Error(err))
 		return err
 	}
-	// TODO: span here
+
 	return nil
 }
 

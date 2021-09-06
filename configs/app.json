@@ -9,5 +9,9 @@
         "database": "account",
         "user": "account",
         "password": "secret"
+    },
+    "kafka": {
+        "addr": "localhost:9092",
+        "topic": "account-cud"
     }
 }

@@ -16,6 +16,7 @@ require (
 	github.com/onsi/gomega v1.16.0
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/rs/zerolog v1.24.0
+	github.com/segmentio/kafka-go v0.4.17
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible

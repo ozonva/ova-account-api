@@ -6,6 +6,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 	olog "github.com/opentracing/opentracing-go/log"
 	"github.com/ozonva/ova-account-api/internal/entity"
+	"github.com/ozonva/ova-account-api/internal/kafka"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	"github.com/ozonva/ova-account-api/internal/utils"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
@@ -18,15 +19,17 @@ import (
 // AccountService ...
 type AccountService struct {
 	pb.UnimplementedAccountServiceServer
-	logger zerolog.Logger
-	repo   repo.Repo
+	logger   zerolog.Logger
+	repo     repo.Repo
+	producer kafka.Producer
 }
 
 // NewAccountService ...
-func NewAccountService(logger zerolog.Logger, repo repo.Repo) *AccountService {
+func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer) *AccountService {
 	return &AccountService{
-		logger: logger.With().Str("service", "AccountService").Logger(),
-		repo:   repo,
+		logger:   logger.With().Str("service", "AccountService").Logger(),
+		repo:     repo,
+		producer: producer,
 	}
 }
 
@@ -62,6 +65,11 @@ func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 
 	err = s.repo.AddAccounts(ctx, []entity.Account{*account})
 	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	if err := s.producer.Send(ctx, kafka.NewAccountEvent(kafka.AccountCreated, *account)); err != nil {
+		s.logger.Error().Err(err).Msg("")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
@@ -108,6 +116,11 @@ func (s *AccountService) createChunkAccounts(ctx context.Context, parentSpan ope
 		return err
 	}
 
+	if err := s.producer.Send(ctx, kafka.NewAccountEvents(kafka.AccountCreated, accounts)...); err != nil {
+		s.logger.Error().Err(err).Msg("")
+		return err
+	}
+
 	return nil
 }
 
@@ -120,13 +133,28 @@ func (s *AccountService) UpdateAccount(ctx context.Context, req *pb.UpdateAccoun
 		return nil, wrapError(err)
 	}
 
+	if err := s.producer.Send(ctx, kafka.NewAccountEvent(kafka.AccountUpdated, account)); err != nil {
+		s.logger.Error().Err(err).Msg("")
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
 	return &pb.UpdateAccountResponse{Account: AccountMarshal(account)}, nil
 }
 
 func (s *AccountService) RemoveAccount(ctx context.Context, req *pb.RemoveAccountRequest) (*emptypb.Empty, error) {
 	s.logger.Info().Str("id", req.Id).Msg("RPC: RemoveAccount")
 
+	account, err := s.repo.DescribeAccount(ctx, req.Id)
+	if err != nil {
+		return nil, wrapError(err)
+	}
+
 	if err := s.repo.RemoveAccount(ctx, req.Id); err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	if err := s.producer.Send(ctx, kafka.NewAccountEvent(kafka.AccountRemoved, *account)); err != nil {
+		s.logger.Error().Err(err).Msg("")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

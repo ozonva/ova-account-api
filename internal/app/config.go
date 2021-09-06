@@ -9,11 +9,12 @@ import (
 
 // Config represents the application configuration.
 type Config struct {
-	Name     string   `json:"name"`
-	Address  string   `json:"address"`
-	GrpcPort string   `json:"grpc_port"`
-	Version  string   `json:"version"`
-	DB       DBConfig `json:"db"`
+	Name     string      `json:"name"`
+	Address  string      `json:"address"`
+	GrpcPort string      `json:"grpc_port"`
+	Version  string      `json:"version"`
+	DB       DBConfig    `json:"db"`
+	Kafka    KafkaConfig `json:"kafka"`
 }
 
 type DBConfig struct {
@@ -22,6 +23,11 @@ type DBConfig struct {
 	Database string `json:"database"`
 	User     string `json:"user"`
 	Password string `json:"password"`
+}
+
+type KafkaConfig struct {
+	Addr  string `json:"addr"`
+	Topic string `json:"topic"`
 }
 
 // DSN return the data source name of DB.

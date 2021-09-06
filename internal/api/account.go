@@ -7,6 +7,7 @@ import (
 	olog "github.com/opentracing/opentracing-go/log"
 	"github.com/ozonva/ova-account-api/internal/entity"
 	"github.com/ozonva/ova-account-api/internal/kafka"
+	"github.com/ozonva/ova-account-api/internal/metrics"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	"github.com/ozonva/ova-account-api/internal/utils"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
@@ -22,14 +23,16 @@ type AccountService struct {
 	logger   zerolog.Logger
 	repo     repo.Repo
 	producer kafka.Producer
+	metrics  metrics.AccountMetrics
 }
 
 // NewAccountService ...
-func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer) *AccountService {
+func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer, stats metrics.AccountMetrics) *AccountService {
 	return &AccountService{
 		logger:   logger.With().Str("service", "AccountService").Logger(),
 		repo:     repo,
 		producer: producer,
+		metrics:  stats,
 	}
 }
 
@@ -72,6 +75,8 @@ func (s *AccountService) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 		s.logger.Error().Err(err).Msg("")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	s.metrics.IncCreatedCounter()
 
 	return &pb.CreateAccountResponse{Account: AccountMarshal(*account)}, nil
 }
@@ -121,6 +126,8 @@ func (s *AccountService) createChunkAccounts(ctx context.Context, parentSpan ope
 		return err
 	}
 
+	s.metrics.IncreaseCreatedCounter(len(accounts))
+
 	return nil
 }
 
@@ -137,6 +144,8 @@ func (s *AccountService) UpdateAccount(ctx context.Context, req *pb.UpdateAccoun
 		s.logger.Error().Err(err).Msg("")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	s.metrics.IncUpdatedCounter()
 
 	return &pb.UpdateAccountResponse{Account: AccountMarshal(account)}, nil
 }
@@ -157,6 +166,8 @@ func (s *AccountService) RemoveAccount(ctx context.Context, req *pb.RemoveAccoun
 		s.logger.Error().Err(err).Msg("")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	s.metrics.IncRemovedCounter()
 
 	return &emptypb.Empty{}, nil
 }

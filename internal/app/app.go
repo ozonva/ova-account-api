@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/ozonva/ova-account-api/internal/kafka"
+	"github.com/ozonva/ova-account-api/internal/metrics"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	"github.com/ozonva/ova-account-api/internal/repo/postgres"
 )
@@ -14,6 +15,7 @@ type App struct {
 	Conf         *Config
 	Store        repo.Store
 	Producer     kafka.Producer
+	Metrics      metrics.AccountMetrics
 	tracerCloser io.Closer
 }
 
@@ -36,10 +38,13 @@ func Init(configPath string) (*App, error) {
 
 	producer := kafka.NewProducer(conf.Kafka.Addr, conf.Kafka.Topic)
 
+	stats := metrics.RegisterMetrics()
+
 	return &App{
 		Conf:         conf,
 		Store:        store,
 		Producer:     producer,
+		Metrics:      stats,
 		tracerCloser: closer,
 	}, nil
 }

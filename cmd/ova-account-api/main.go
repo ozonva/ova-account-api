@@ -9,6 +9,7 @@ import (
 
 	"github.com/ozonva/ova-account-api/internal/api"
 	"github.com/ozonva/ova-account-api/internal/app"
+	"github.com/ozonva/ova-account-api/internal/metrics"
 	"github.com/rs/zerolog"
 )
 
@@ -37,9 +38,12 @@ func main() {
 
 	updatingConfiguration(logger, application.Conf, *confPath, 10)
 
-	logger.Info().Msg("Starting the server...")
+	logger.Info().Msg("Starting the servers...")
 	server := api.NewServer(logger, application)
 	server.Start()
+
+	metricsServer := metrics.NewServer()
+	metricsServer.Start()
 	logger.Info().Msgf("The application is ready to serve requests on port %s.", application.Conf.GrpcPort)
 
 	interrupt := make(chan os.Signal, 1)
@@ -50,9 +54,11 @@ func main() {
 		logger.Info().Msgf("Received a signal: %v", x)
 	case err := <-server.Notify():
 		logger.Error().Err(err).Msg("Received an error from the grpc server")
+	case err := <-metricsServer.Notify():
+		logger.Error().Err(err).Msg("Received an error from the metrics server")
 	}
 
-	logger.Info().Msg("Stopping the server...")
+	logger.Info().Msg("Stopping the servers...")
 	server.Stop()
 }
 

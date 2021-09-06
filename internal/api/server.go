@@ -34,7 +34,7 @@ func NewServer(logger zerolog.Logger, application *app.App) *Server {
 		),
 	)
 
-	accountService := NewAccountService(logger, application.Store.Account(), application.Producer)
+	accountService := NewAccountService(logger, application.Store.Account(), application.Producer, application.Metrics)
 	pb.RegisterAccountServiceServer(server, accountService)
 
 	return &Server{

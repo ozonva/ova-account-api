@@ -14,7 +14,7 @@ type Store struct {
 	account *accountRepo
 }
 
-func NewStore(dsn string) (*Store, error) {
+func NewStore(dsn string, maxOpenConns, maxIdleConns, ConnMaxLifetime int) (*Store, error) {
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
@@ -24,10 +24,9 @@ func NewStore(dsn string) (*Store, error) {
 		return nil, err
 	}
 
-	// TODO: move to configuration
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(2)
-	db.SetConnMaxLifetime(time.Minute)
+	db.SetMaxOpenConns(maxOpenConns)
+	db.SetMaxIdleConns(maxIdleConns)
+	db.SetConnMaxLifetime(time.Duration(ConnMaxLifetime) * time.Second)
 
 	return &Store{db: db}, nil
 }

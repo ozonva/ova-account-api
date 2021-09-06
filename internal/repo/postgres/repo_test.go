@@ -83,10 +83,10 @@ func Test_accountRepo_AddAccounts(t *testing.T) {
 	accounts := generateAccounts(4)
 	var args []driver.Value
 	for _, acc := range accounts {
-		args = append(args, acc.Value, acc.UserID)
+		args = append(args, acc.ID, acc.Value, acc.UserID)
 	}
 
-	mock.ExpectExec("INSERT INTO accounts \\(value, user_id\\) VALUES").
+	mock.ExpectExec("INSERT INTO accounts \\(id, value, user_id\\) VALUES").
 		WithArgs(args...).
 		WillReturnResult(sqlmock.NewResult(4, 4))
 

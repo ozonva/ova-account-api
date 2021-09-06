@@ -25,6 +25,8 @@ var _ = Describe("Account Service", func() {
 	var (
 		ctrl     *gomock.Controller
 		mockRepo *mocks.MockRepo
+		producer *mocks.MockProducer
+		metrics  *mocks.MockAccountMetrics
 		service  *AccountService
 		ctx      context.Context
 	)
@@ -32,7 +34,9 @@ var _ = Describe("Account Service", func() {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 		mockRepo = mocks.NewMockRepo(ctrl)
-		service = NewAccountService(zerolog.Logger{}, mockRepo)
+		producer = mocks.NewMockProducer(ctrl)
+		metrics = mocks.NewMockAccountMetrics(ctrl)
+		service = NewAccountService(zerolog.Logger{}, mockRepo, producer, metrics)
 		ctx = context.TODO()
 	})
 
@@ -47,6 +51,8 @@ var _ = Describe("Account Service", func() {
 				acc, _ := entity.NewAccount(1, "user@ozon.ru")
 
 				mockRepo.EXPECT().AddAccounts(ctx, mocks.AccountValueEq([]entity.Account{*acc})).Return(nil)
+				producer.EXPECT().Send(ctx, gomock.Any()).Return(nil) // TODO: mb create special matcher
+				metrics.EXPECT().IncCreatedCounter().Times(1)
 
 				resp, err := service.CreateAccount(ctx, req)
 
@@ -80,6 +86,8 @@ var _ = Describe("Account Service", func() {
 				}
 
 				mockRepo.EXPECT().UpdateAccount(ctx, *acc).Return(nil)
+				producer.EXPECT().Send(ctx, gomock.Any()).Return(nil)
+				metrics.EXPECT().IncUpdatedCounter().Times(1)
 
 				resp, err := service.UpdateAccount(ctx, req)
 				checkAccountInResponse(resp.GetAccount(), *acc)
@@ -108,7 +116,9 @@ var _ = Describe("Account Service", func() {
 				accounts := entity.CreateTestAccounts(25)
 				req := createMultiCreateAccountRequest(accounts)
 
-				mockRepo.EXPECT().AddAccounts(ctx, mocks.AccountValueEq(accounts)).Return(nil)
+				mockRepo.EXPECT().AddAccounts(gomock.Any(), mocks.AccountValueEq(accounts)).Return(nil)
+				producer.EXPECT().Send(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+				metrics.EXPECT().IncreaseCreatedCounter(25).Times(1)
 
 				_, err := service.MultiCreateAccount(ctx, req)
 				Expect(err).Should(BeNil())
@@ -121,9 +131,12 @@ var _ = Describe("Account Service", func() {
 				req := createMultiCreateAccountRequest(accounts)
 
 				gomock.InOrder(
-					mockRepo.EXPECT().AddAccounts(ctx, mocks.AccountValueEq(accounts[:32])).Return(nil),
-					mockRepo.EXPECT().AddAccounts(ctx, mocks.AccountValueEq(accounts[32:])).Return(nil),
+					mockRepo.EXPECT().AddAccounts(gomock.Any(), mocks.AccountValueEq(accounts[:32])).Return(nil),
+					mockRepo.EXPECT().AddAccounts(gomock.Any(), mocks.AccountValueEq(accounts[32:])).Return(nil),
 				)
+				producer.EXPECT().Send(gomock.Any(), gomock.Any()).Return(nil).Times(2)
+				metrics.EXPECT().IncreaseCreatedCounter(32).Times(1)
+				metrics.EXPECT().IncreaseCreatedCounter(55 - 32).Times(1)
 
 				_, err := service.MultiCreateAccount(ctx, req)
 				Expect(err).Should(BeNil())

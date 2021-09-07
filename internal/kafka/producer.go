@@ -26,6 +26,7 @@ func NewProducer(addr, topic string) Producer {
 		w: &kafka.Writer{
 			Addr:  kafka.TCP(addr),
 			Topic: topic,
+			Async: true,
 		},
 	}
 }

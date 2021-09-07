@@ -21,12 +21,17 @@ type App struct {
 
 // Init ...
 func Init(configPath string) (*App, error) {
-	conf, err := ParseConfig(configPath)
+	conf, err := NewConfig(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("can't process the configuration: %v", err)
 	}
 
-	store, err := postgres.NewStore(conf.DB.DSN())
+	store, err := postgres.NewStore(
+		conf.DB.DSN(),
+		conf.DB.Pool.MaxOpenConns,
+		conf.DB.Pool.MaxIdleConn,
+		conf.DB.Pool.ConnMaxLifetime,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to the db: %v", err)
 	}

@@ -12,6 +12,7 @@ var ErrRecordNotFound = errors.New("record not found")
 type Store interface {
 	Account() Repo
 	Close() error
+	Health() error
 }
 
 // DBError wraps sql.ErrNoRows.

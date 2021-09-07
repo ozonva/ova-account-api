@@ -11,7 +11,6 @@ import (
 	"github.com/ozonva/ova-account-api/internal/mocks"
 	"github.com/ozonva/ova-account-api/internal/repo"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
-	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -37,7 +36,7 @@ var _ = Describe("Account Service", func() {
 		mockRepo = mocks.NewMockRepo(ctrl)
 		producer = mocks.NewMockProducer(ctrl)
 		metrics = mocks.NewMockAccountMetrics(ctrl)
-		service = NewAccountService(zerolog.Logger{}, mockRepo, producer, metrics, batchSize)
+		service = NewAccountService(mockRepo, producer, metrics, batchSize)
 		ctx = context.TODO()
 	})
 

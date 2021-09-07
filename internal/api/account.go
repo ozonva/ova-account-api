@@ -12,6 +12,7 @@ import (
 	"github.com/ozonva/ova-account-api/internal/utils"
 	pb "github.com/ozonva/ova-account-api/pkg/ova-account-api"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -28,9 +29,9 @@ type AccountService struct {
 }
 
 // NewAccountService ...
-func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer, stats metrics.AccountMetrics, batchSize int) *AccountService {
+func NewAccountService(repo repo.Repo, producer kafka.Producer, stats metrics.AccountMetrics, batchSize int) *AccountService {
 	return &AccountService{
-		logger:    logger.With().Str("service", "AccountService").Logger(),
+		logger:    log.With().Str("service", "AccountService").Logger(),
 		repo:      repo,
 		producer:  producer,
 		metrics:   stats,

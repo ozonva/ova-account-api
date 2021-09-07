@@ -20,19 +20,21 @@ import (
 // AccountService ...
 type AccountService struct {
 	pb.UnimplementedAccountServiceServer
-	logger   zerolog.Logger
-	repo     repo.Repo
-	producer kafka.Producer
-	metrics  metrics.AccountMetrics
+	logger    zerolog.Logger
+	repo      repo.Repo
+	producer  kafka.Producer
+	metrics   metrics.AccountMetrics
+	batchSize int
 }
 
 // NewAccountService ...
-func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer, stats metrics.AccountMetrics) *AccountService {
+func NewAccountService(logger zerolog.Logger, repo repo.Repo, producer kafka.Producer, stats metrics.AccountMetrics, batchSize int) *AccountService {
 	return &AccountService{
-		logger:   logger.With().Str("service", "AccountService").Logger(),
-		repo:     repo,
-		producer: producer,
-		metrics:  stats,
+		logger:    logger.With().Str("service", "AccountService").Logger(),
+		repo:      repo,
+		producer:  producer,
+		metrics:   stats,
+		batchSize: batchSize,
 	}
 }
 
@@ -99,8 +101,7 @@ func (s *AccountService) MultiCreateAccount(ctx context.Context, req *pb.MultiCr
 		accounts = append(accounts, *acc)
 	}
 
-	batchSize := 32
-	chunks, _ := utils.ChunkSliceAccount(accounts, batchSize)
+	chunks, _ := utils.ChunkSliceAccount(accounts, s.batchSize)
 	for _, chunk := range chunks {
 		if err := s.createChunkAccounts(ctx, span, chunk); err != nil {
 			return nil, status.Errorf(codes.Internal, err.Error())

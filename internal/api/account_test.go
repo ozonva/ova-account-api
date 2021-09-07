@@ -29,6 +29,7 @@ var _ = Describe("Account Service", func() {
 		metrics  *mocks.MockAccountMetrics
 		service  *AccountService
 		ctx      context.Context
+		batchSize = 32
 	)
 
 	BeforeEach(func() {
@@ -36,7 +37,7 @@ var _ = Describe("Account Service", func() {
 		mockRepo = mocks.NewMockRepo(ctrl)
 		producer = mocks.NewMockProducer(ctrl)
 		metrics = mocks.NewMockAccountMetrics(ctrl)
-		service = NewAccountService(zerolog.Logger{}, mockRepo, producer, metrics)
+		service = NewAccountService(zerolog.Logger{}, mockRepo, producer, metrics, batchSize)
 		ctx = context.TODO()
 	})
 
@@ -135,8 +136,8 @@ var _ = Describe("Account Service", func() {
 					mockRepo.EXPECT().AddAccounts(gomock.Any(), mocks.AccountValueEq(accounts[32:])).Return(nil),
 				)
 				producer.EXPECT().Send(gomock.Any(), gomock.Any()).Return(nil).Times(2)
-				metrics.EXPECT().IncreaseCreatedCounter(32).Times(1)
-				metrics.EXPECT().IncreaseCreatedCounter(55 - 32).Times(1)
+				metrics.EXPECT().IncreaseCreatedCounter(batchSize).Times(1)
+				metrics.EXPECT().IncreaseCreatedCounter(55 - batchSize).Times(1)
 
 				_, err := service.MultiCreateAccount(ctx, req)
 				Expect(err).Should(BeNil())

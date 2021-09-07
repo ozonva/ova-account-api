@@ -18,11 +18,12 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Host     string `json:"host"`
-	Port     string `json:"port"`
-	Database string `json:"database"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	Host      string `json:"host"`
+	Port      string `json:"port"`
+	Database  string `json:"database"`
+	User      string `json:"user"`
+	Password  string `json:"password"`
+	BatchSize int    `json:"batch_size"`
 }
 
 type KafkaConfig struct {

@@ -4,14 +4,13 @@ import (
 	"net"
 	"net/mail"
 	"strings"
-)
 
-// AccountCounter represents a temporary counter for Account entities.
-var AccountCounter uint64
+	"github.com/google/uuid"
+)
 
 // Account represents the note's category.
 type Account struct {
-	ID     uint64
+	ID     string
 	UserID uint64 `db:"user_id"`
 	Value  string
 }
@@ -23,9 +22,7 @@ func NewAccount(userID uint64, value string) (*Account, error) {
 		return nil, err
 	}
 
-	AccountCounter++
-
-	return &Account{ID: AccountCounter, UserID: userID, Value: address.Address}, nil
+	return &Account{ID: uuid.New().String(), UserID: userID, Value: address.Address}, nil
 }
 
 // // Value returns the Value of the Account.

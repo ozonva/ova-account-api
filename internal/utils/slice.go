@@ -60,8 +60,8 @@ func FilterSliceString(s []string, filter func(string) bool) []string {
 
 // ConvertAccountsToMap converts a slice of entity.Account to a map.
 // key - Account.ID, value - entity.Account.
-func ConvertAccountsToMap(s []entity.Account) map[uint64]entity.Account {
-	out := make(map[uint64]entity.Account, len(s))
+func ConvertAccountsToMap(s []entity.Account) map[string]entity.Account {
+	out := make(map[string]entity.Account, len(s))
 	for _, account := range s {
 		out[account.ID] = account
 	}

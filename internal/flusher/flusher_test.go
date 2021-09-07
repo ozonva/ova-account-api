@@ -1,8 +1,10 @@
 package flusher_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"testing"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
@@ -12,16 +14,23 @@ import (
 	"github.com/ozonva/ova-account-api/internal/mocks"
 )
 
+func TestFlusher(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Flusher Suite")
+}
+
 var _ = Describe("Flusher", func() {
 	var (
 		ctrl     *gomock.Controller
 		mockRepo *mocks.MockRepo
 		accounts []entity.Account
+		ctx      context.Context
 	)
 
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 		mockRepo = mocks.NewMockRepo(ctrl)
+		ctx = context.Background()
 	})
 
 	AfterEach(func() {
@@ -37,13 +46,13 @@ var _ = Describe("Flusher", func() {
 			It("should return nil", func() {
 				flusher := flusher.NewFlusher(3, mockRepo)
 				gomock.InOrder(
-					mockRepo.EXPECT().AddAccounts(accounts[0:3]).Return(nil),
-					mockRepo.EXPECT().AddAccounts(accounts[3:6]).Return(nil),
-					mockRepo.EXPECT().AddAccounts(accounts[6:9]).Return(nil),
-					mockRepo.EXPECT().AddAccounts(accounts[9:10]).Return(nil),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[0:3]).Return(nil),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[3:6]).Return(nil),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[6:9]).Return(nil),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[9:10]).Return(nil),
 				)
 
-				Expect(flusher.Flush(accounts)).Should(BeNil())
+				Expect(flusher.Flush(ctx, accounts)).Should(BeNil())
 			})
 		})
 
@@ -51,18 +60,18 @@ var _ = Describe("Flusher", func() {
 			It("should return a part of the list", func() {
 				flusher := flusher.NewFlusher(5, mockRepo)
 				gomock.InOrder(
-					mockRepo.EXPECT().AddAccounts(accounts[0:5]).Return(nil),
-					mockRepo.EXPECT().AddAccounts(accounts[5:10]).Return(errors.New("can't store")),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[0:5]).Return(nil),
+					mockRepo.EXPECT().AddAccounts(ctx, accounts[5:10]).Return(errors.New("can't store")),
 				)
 
-				Expect(flusher.Flush(accounts)).Should(Equal(accounts[5:10]))
+				Expect(flusher.Flush(ctx, accounts)).Should(Equal(accounts[5:10]))
 			})
 		})
 
 		Context("when the batch size is invalid", func() {
 			It("should return the entire list", func() {
 				flusher := flusher.NewFlusher(-1, mockRepo)
-				Expect(flusher.Flush(accounts)).Should(Equal(accounts))
+				Expect(flusher.Flush(ctx, accounts)).Should(Equal(accounts))
 			})
 		})
 	})

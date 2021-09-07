@@ -9,19 +9,26 @@ import (
 
 // Config represents the application configuration.
 type Config struct {
-	Name     string   `json:"name"`
-	Address  string   `json:"address"`
-	GrpcPort string   `json:"grpc_port"`
-	Version  string   `json:"version"`
-	DB       DBConfig `json:"db"`
+	Name     string      `json:"name"`
+	Address  string      `json:"address"`
+	GrpcPort string      `json:"grpc_port"`
+	Version  string      `json:"version"`
+	DB       DBConfig    `json:"db"`
+	Kafka    KafkaConfig `json:"kafka"`
 }
 
 type DBConfig struct {
-	Host     string `json:"host"`
-	Port     string `json:"port"`
-	Database string `json:"database"`
-	User     string `json:"user"`
-	Password string `json:"password"`
+	Host      string `json:"host"`
+	Port      string `json:"port"`
+	Database  string `json:"database"`
+	User      string `json:"user"`
+	Password  string `json:"password"`
+	BatchSize int    `json:"batch_size"`
+}
+
+type KafkaConfig struct {
+	Addr  string `json:"addr"`
+	Topic string `json:"topic"`
 }
 
 // DSN return the data source name of DB.

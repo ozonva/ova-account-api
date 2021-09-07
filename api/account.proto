@@ -11,12 +11,14 @@ service AccountService {
     rpc DescribeAccount(DescribeAccountRequest) returns (DescribeAccountResponse) {}
     rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
     rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+    rpc MultiCreateAccount(MultiCreateAccountRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {}
     rpc RemoveAccount(RemoveAccountRequest) returns (google.protobuf.Empty) {}
 }
 
 // Account is the protobuf response of the entity.Account.
 message Account {
-    uint64 id = 1;
+    string id = 1;
     uint64 user_id = 2;
     string value = 3;
 }
@@ -30,14 +32,15 @@ message ListAccountsResponse {
 }
 
 message DescribeAccountRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message RemoveAccountRequest {
-    uint64 id = 1;
+    string id = 1;
 }
 
 message CreateAccountRequest {
+    uint64 user_id = 1;
     string value = 2;
 }
 
@@ -49,4 +52,16 @@ message ListAccountsRequest {
     uint64 user_id = 1;
     uint64 limit = 2;
     uint64 offset = 3;
+}
+
+message MultiCreateAccountRequest {
+    repeated CreateAccountRequest accounts = 1;
+}
+
+message UpdateAccountRequest {
+    Account account = 1;
+}
+
+message UpdateAccountResponse {
+    Account account = 1;
 }

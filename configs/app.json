@@ -8,6 +8,11 @@
         "port": "54321",
         "database": "account",
         "user": "account",
-        "password": "secret"
+        "password": "secret",
+        "batch_size": 32
+    },
+    "kafka": {
+        "addr": "localhost:9092",
+        "topic": "account-cud"
     }
 }

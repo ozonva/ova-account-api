@@ -8,6 +8,7 @@ import (
 
 	"github.com/ozonva/ova-account-api/internal/api"
 	"github.com/ozonva/ova-account-api/internal/app"
+	"github.com/ozonva/ova-account-api/internal/health"
 	"github.com/ozonva/ova-account-api/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -44,6 +45,9 @@ func main() {
 
 	metricsServer := metrics.NewServer()
 	metricsServer.Start()
+
+	healthServer := health.NewServer(application.Conf.HealthPort, application.Check)
+	healthServer.Start()
 	log.Info().Msgf("The application is ready to serve requests on port %s.", application.Conf.GrpcPort)
 
 	interrupt := make(chan os.Signal, 1)
@@ -56,6 +60,8 @@ func main() {
 		log.Error().Err(err).Msg("Received an error from the grpc server")
 	case err := <-metricsServer.Notify():
 		log.Error().Err(err).Msg("Received an error from the metrics server")
+	case err := <-healthServer.Notify():
+		log.Error().Err(err).Msg("Received an error from the health server")
 	}
 
 	log.Info().Msg("Stopping the servers...")
@@ -63,6 +69,9 @@ func main() {
 
 	if err := metricsServer.Stop(); err != nil {
 		log.Error().Err(err).Msg("Got an error while stopping the metrics server.")
+	}
+	if err := healthServer.Stop(); err != nil {
+		log.Error().Err(err).Msg("Got an error while stopping the health server.")
 	}
 }
 

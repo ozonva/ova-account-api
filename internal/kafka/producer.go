@@ -15,6 +15,7 @@ type Event interface {
 type Producer interface {
 	Send(ctx context.Context, messages ...Event) error
 	Close() error
+	Health() error
 }
 
 type producer struct {
@@ -42,6 +43,11 @@ func (p *producer) Send(ctx context.Context, messages ...Event) error {
 
 func (p *producer) Close() error {
 	return p.w.Close()
+}
+
+func (p *producer) Health() error {
+	// TODO: Add a health check
+	return nil
 }
 
 func convertEvents(events []Event) []kafka.Message {

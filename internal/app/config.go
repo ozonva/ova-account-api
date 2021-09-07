@@ -12,11 +12,12 @@ import (
 
 // Config represents the application configuration.
 type Config struct {
-	Name     string      `mapstructure:"SERVICE"`
-	GrpcPort string      `mapstructure:"GRPC_PORT"`
-	Debug    bool        `mapstructure:"DEBUG"`
-	DB       DBConfig    `mapstructure:",squash"`
-	Kafka    KafkaConfig `mapstructure:",squash"`
+	Name       string      `mapstructure:"SERVICE"`
+	GrpcPort   string      `mapstructure:"GRPC_PORT"`
+	HealthPort string      `mapstructure:"HEALTH_PORT"`
+	Debug      bool        `mapstructure:"DEBUG"`
+	DB         DBConfig    `mapstructure:",squash"`
+	Kafka      KafkaConfig `mapstructure:",squash"`
 }
 
 type DBConfig struct {
@@ -79,6 +80,7 @@ func NewConfig(path string) (*Config, error) {
 func setDefault() {
 	viper.SetDefault("SERVICE", "Service")
 	viper.SetDefault("GRPC_PORT", "8080")
+	viper.SetDefault("HEALTH_PORT", "8181")
 	viper.SetDefault("DEBUG", false)
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 10)
 	viper.SetDefault("DB_MAX_IDLE_CONNS", 2)

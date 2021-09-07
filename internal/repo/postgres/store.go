@@ -42,3 +42,16 @@ func (s *Store) Account() repo.Repo {
 func (s *Store) Close() error {
 	return s.db.Close()
 }
+
+func (s *Store) Health() error {
+	var err error
+	for i := 0; i < 5; i++ {
+		_, err = s.db.Query("SELECT 1")
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+
+	return err
+}
